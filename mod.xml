@@ -3,7 +3,7 @@
     <name>Notebook</name>
     <description>Adds a book for you to keep notes.</description>
     <author>Etrotta, VorTechnix</author>
-    <version>a.2.0</version>
+    <version>0.2.2</version>
     <website>https://discord.gg/ZDyYpTE</website>
     <init>
       <include id="legacy.xml"/>
