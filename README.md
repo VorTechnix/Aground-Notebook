@@ -19,7 +19,7 @@ If anyone cares, here's the technical details of why you can now use numbers and
 
 - |. and |* are all used for separating the parts of the code, since everything is in the same string. The specific formatting is:
 
-      "Title|.Body|\*Next Title|.Next Body"
+      "Title|.Body|*Next Title|.Next Body"
 
 - ' and " are used to determine strings start/ends in pretty much all code languages
 - Numbers are no longer used for saving the ID, because we started using arrays ~~like civilized programmers~~ to keep track of things for deleting or editing purposes.
