@@ -1,0 +1,22 @@
+<data>
+  <action>
+    function deQuote(s){
+      s.split("'"); s.join("’");
+      s.split('"'); s.join("〞");
+    }
+  </action>
+  <action>
+    function noteTagify(typ,args,?bdy){
+      ret = ["@lt;",typ];
+      if( args != null )ret.push(" "+args);
+      if( bdy != null ) ret.push(">"+bdy+ret[0]+ret[1]+">"); else ret.push("/>");
+      return ret.join('');
+    }
+  </action>
+  <action>
+
+  </action>
+  <action>
+    //evalXml('&lt;dialogue text="Hi"/>');
+  </action>
+</data>
