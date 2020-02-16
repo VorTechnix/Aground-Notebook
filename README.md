@@ -3,7 +3,7 @@ Adds a book for you to keep notes. Releases are hosted at https://aground.mod.io
 ## Description 
 Notebook is dropped in-game in a chest under a random tree around the alchemist cave on start island. If that doesn't show up use `player.addItem('notebook')` in the dev console (Ctrl + Shift + D).
 
-**Warning: Do not use quotation marks (single or double), |. or |\* in any of your notes.
+**Warning: Do not use quotation marks (single or double), |. or |\* in any of your notes.**
 
 If you do use one of the above, you may be unable to open your Notebook or your notes may be corrupted.
 
