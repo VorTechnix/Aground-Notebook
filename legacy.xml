@@ -1,0 +1,70 @@
+<legacy>
+  <action>
+    function etSeparateNotes(string){
+      var notes = string.split("@");
+      var cNotes = [];
+      for (note in notes){
+        cNote = {
+        id:note.substring(note.indexOf("@")+1, 2),
+        title:note.substring(note.indexOf("$")+1, note.lastIndexOf("$")),
+        text:note.substring(note.indexOf("#")+1, note.lastIndexOf("#"))
+        }
+        cNotes.push(cNote);
+      }
+      return cNotes;
+    }
+  </action>
+  <action>
+    function etLegacyListItem(note){
+      var name = note.text;
+      if (name == null) return null;
+        var icon = "paper.ico";
+        var anim = "single";
+
+        //animation="'+anim+'"
+        list =
+          '&lt;listItem icon="'+icon+'" title="notebook.eval{text:'+name+'}" >
+          &lt;closeWindows modal="true" />
+          &lt;action>legacyNoteUpdate(player,'+note.id+');&lt;/action>
+          &lt;/listItem>';
+        return list;
+          // &lt;closeWindows modal="true" />
+    }
+  </action>
+  <action>
+    function etLegacyCheck(player){
+      //a = ["00$Example$#The quick brown fox jumps over the lazy dog.#@01$Backward Compatibility$#To fix a screw up#","A third option|.00$This is the new format$#"];
+      a = player.getString('notebook_notes').split('|*');
+      o = [];
+      for( b in a ) {
+        if( b.indexOf('00$') != -1 && b.indexOf('$#') != -1 && b.lastIndexOf("#") == b.length -1 ) {o.push( {id:a.indexOf(b),text:b} );}
+      }
+      if(o != []) return o; else return null;
+    }
+  </action>
+  <!-- <action>legacyNoteWindow(player,evalXml)</action> -->
+  <action>
+    function legacyNoteWindow(player,evalXml){
+      win = ['&lt;window type="craft" title="item.names.notebook">','&lt;/window>'];
+      dlg= '&lt;dialogue text="We have found some notes that look like they were from an older version of notebook. Click on any of the following to import them:"/>';
+      lst = etLegacyCheck(player); lsti = [];
+      if( lst == null ) break;
+      for( i in lst ) lsti.push(etLegacyListItem(i));
+      evalXml(dlg+win[0]+lsti.join("")+win[1]);
+
+    }
+  </action>
+  <action>
+    // legacyNoteUpdate(player,etLegacyCheck(player)[0])
+    function legacyNoteUpdate(player,id){
+      //_o = etLegacyCheck(player)[0];
+      notes = player.getString('notebook_notes').split('|*');
+      pull = etSeparateNotes(notes[id]); out = [];
+      notes.remove(notes[id]);
+      for( p in pull ) {
+        out.push(p.title+"|."+p.text);
+      } out.push(notes.join('|*')); player.setString('notebook_notes', out.join("|*") );
+      //return out.join("|*");
+    }
+  </action>
+</legacy>

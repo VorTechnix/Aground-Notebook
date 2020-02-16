@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mod>
+    <name>Notebook</name>
+    <description>Adds a book for you to keep notes.</description>
+    <author>Etrotta, VorTechnix</author>
+    <version>a.2.0</version>
+    <website>https://discord.gg/ZDyYpTE</website>
+    <init>
+      <include id="legacy.xml"/>
+      <include id="procedure.xml"/>
+
+      <tile id="notebook.ico" sheet="items.png" x="0"/>
+      <tile id="quill.ico" sheet="items.png" x="1"/>
+      <tile id="paper.ico" sheet="items.png" x="2"/>
+
+      <item id="notebook" icon="notebook.ico" weight="2" type="tool">
+        <action name="check_notes" id="use">
+          <run procedure="notebook"/>
+        </action>
+      </item>
+
+
+    <lang id="en_US">
+      <section id="item.names">
+        <text id="notebook">Notebook</text>
+      </section>
+      <section id="item.descriptions">
+        <text id="notebook">Write all your notes here.\nYou cannot use quotation marks for the time being though...</text>
+      </section>
+      <section id="actions">
+        <text id="check_notes">Check notes</text>
+      </section>
+      <section id="notebook">
+        <text id="eval">{text}</text>
+        <text id="create">Create</text>
+          <text id="create_desc">Creates another note</text>
+          <text id="create_title">Note Title:</text>
+          <text id="create_description">Note:</text>
+        <text id="edit">Edit</text>
+        <text id="delete">Remove</text>
+        <text id="legacy">Check for legacy note strings</text>
+        <text id="legacy_desc">If no window appears, no strings were found.</text>
+      </section>
+    </lang>
+
+    <onLoad>
+      <action>
+      if (getString("notebook_notes") == null){
+        setString("notebook_notes","Example|.The quick brown fox jumps over the lazy dog.");
+        //Place notebook in a chest under a tree on start island
+        p = [];
+        for( a in area.getObjectsById('tree') ) {
+          if(a.tile_x >= 72 && a.tile_x &lt;= 90) p.push(a.tile_x);
+        } p = p[Std.random(p.length+1)]; evalXml('&lt;object id="treasure_chest" x="'+p+'" y="0">this.inventory.addItems(Item.get("notebook"),1);&lt;/object>');
+      }
+      </action>
+    </onLoad>
+
+	</init>
+</mod>
