@@ -18,7 +18,7 @@ jobs:
         run: |
           name="notebook"
           tag=$(git describe --tags --abbrev=0)
-          filename="$name-$tag.zip"
+          filename="$name_$tag.zip"
           zip "$filename" *
 
           echo "::set-output name=modfile::$filename"
