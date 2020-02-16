@@ -3,7 +3,7 @@ name: Upload to modio
 on:
   push:
     tags:
-      - '*'
+      - '*.*.*'
 
 jobs:
   upload:
@@ -20,13 +20,15 @@ jobs:
           tag=$(git describe --tags --abbrev=0)
           filename="$name-$tag.zip"
           zip "$filename" *
+
           echo "::set-output name=modfile::$filename"
           echo "::set-output name=version::$tag"
-      - uses: nickelc/upload-to-modio@v1
+
+      - name: Upload
+        uses: nickelc/upload-to-modio@v1
         with:
-          test-env: true
           token: ${{ secrets.MODIO_TOKEN }}
-          game: 206
-          mod: 1041
+          game: 34
+          mod: 67662
           version: ${{ steps.package.outputs.version }}
           path: ${{ steps.package.outputs.modfile }}
