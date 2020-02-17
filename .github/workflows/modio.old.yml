@@ -17,12 +17,12 @@ jobs:
         id: package
         run: |
           name="notebook"
-          version="$(grep -o '<version>.*</version>' mod.xml | sed -e 's|<version>\([^<]*\)</version>|\1|g')"
-          filename="$name_$version.zip"
+          tag=$(git describe --tags --abbrev=0)
+          filename="$name_$tag.zip"
           zip "$filename" *
 
           echo "::set-output name=modfile::$filename"
-          echo "::set-output name=version::$version"
+          echo "::set-output name=version::$tag"
 
       - name: Upload
         uses: nickelc/upload-to-modio@v1
