@@ -1,192 +1,75 @@
 <data>
   <action>
-    //For debugging and general exception handling (because terras just says you forgot something :)
-    function errorNote( _c ){
-      err = {id:"501",title:"501",text:"Nonesuch!"}
-      switch _c {
-        case 404:{ err = {id:""+_c,title:""+_c,text:"Note not found!"} }
-        case 413:{ err = {id:""+_c,title:""+_c,text:"OVERFLOW! Too many entries!"} }
-        case 418:{ err = {id:""+_c,title:""+_c,text:"I'm a Teapot! I can't brew coffee."} }
-        case 423:{ err = {id:""+_c,title:""+_c,text:"This resource/feature is locked. (See source code)"} }
-        case 426:{ err = {id:""+_c,title:""+_c,text:"Please install the latest version of this mod."} }
-      }
-      return err;
-    }
-  </action>
-<!-- Errorize line 88 -->
-<!-- note{title:@spagetthi@,text:@mamas spagetthi@}note{title:@test@,text:@text@} -->
-<!-- 00$title$#text#@01$spagetthi$#momas# -->
-<!-- // $Example Title$#The quick brown fox jumps over the lazy dog.#@$Tasty$#Moma's Spagetthi# -->
-<!-- #(for CoffeeScript) // string="Test 1|.The quick brown fox jumps over the lazy dog.|*Test 2|.Moma's Spagetthi is #1!|*Test 3|.To be or not to be; that is the question."-->
-<!--
-$ - title start and end
-# - text start and end
-@ - notes separator
- -->
-  <action>
-    function separateNotes(string){
-      var notes = string.split("|*");
-      var cNotes = [];
-      for (note in notes){
-        i = notes.indexOf(note); if (i &lt; 10){i = "0" + i;}else{i = "" + i;}
-        cNote = {
-          //id:note.substring(note.indexOf("|*")+1, 2),
-          id:i,
-          title:note.substring(0, note.indexOf("|.")),
-          text:note.substring(note.indexOf("|.")+2)
-        }
-        cNotes.push(cNote);
-      }
-      return cNotes;
-    }
-
     function generateNoteListItem(note){
       var id = note.id;
       var name = note.title;
       var desc = note.text;
+      var book = note.book;
       if (name == null) return null;
         var icon = "paper.ico";
-        var anim = "single";
 
-        //animation="'+anim+'"
         list =
-          '&lt;listItem icon="'+icon+'" title="notebook.eval{text:'+name+'}" >
-          &lt;tooltip>
-          &lt;option title="notebook.eval{text:'+desc+'}" size="small" />
-          &lt;/tooltip>
-          &lt;closeWindows modal="true" />
-          &lt;action> kamikazeNote('+note.id+',evalXml) &lt;/action>
-          &lt;/listItem>';
+          "&lt;listItem icon='"+icon+"' title='notebook.eval{text:"+name+"}' >
+            &lt;tooltip>
+              &lt;option title='notebook.eval{text:"+desc+"}' size='small' />
+            &lt;/tooltip>
+            &lt;closeWindows modal='true' />
+            &lt;action> noteActions(evalXml,"+id+",'"+book+"') &lt;/action>
+          &lt;/listItem>";
         return list;
           // &lt;closeWindows modal="true" />
     }
-
-    function createNote(evalXml){
-      string = "
-      &lt;window type='input' message='notebook.create_title'>
-        &lt;action> setGlobal('wip_note',result); createDescription(player,evalXml); &lt;/action>
-      &lt;/window>
-      ";
-      evalXml(string);
-    }
-    function cleanNotes(notes){
-      var p = [notes.indexOf("|*")==0,notes.indexOf("|*"),notes.lastIndexOf("|*")==notes.length-2];
-      if (p[0]==true){notes = notes.substr(2);}
-      if (p[2]==true){notes = notes.substr(0,notes.length-2);}
-      if (p[1]!=-1){notes = notes.split("|*|*");notes = notes[0]+"|*"+notes[1];}
-      return notes;
-    }
-    function createDescription(player,evalXml){
-      string = "
-      &lt;window type='input' message='notebook.create_description'>
-        &lt;action>
-          var note = {title:getGlobal('wip_note'),description:result};
-          saveNote(note,player);
-        &lt;/action>
-        &lt;run procedure='notebook'/>
-      &lt;/window>
-      ";
-      evalXml(string);
-    }
-    function saveNote(note,player){
-        var id = 00;
-        var notes = player.getString('notebook_notes');
-        while (notes.indexOf(id) != -1){
-          id ++;
-          if (id == 100) {trace("over the notes limit!"); break; return;}
-        }
-        var newNote = ((notes=="" || notes.lastIndexOf("|*")==notes.length-2)?"":"|*") +note.title+"|."+note.description;
-        player.setString("notebook_notes",player.getString("notebook_notes") + newNote);
-    }
-    function getNoteByID(id,player){
-      var notes = player.getString("notebook_notes");
-      _r = separateNotes(notes)[Std.parseInt(id)]; _r!=null?return _r:return errorNote(404);
-    }
-    function kamikazeNote(id,evalXml){
-      // kamikaze because it pretty much asks to be killed lol
-      var string = "
-      &lt;menu section='notebook' closeable='true'>'
-        &lt;choice id='edit'>
-          &lt;action>
-            editNote('"+id+"',player,evalXml);
-          &lt;/action>
-        &lt;/choice>
-        &lt;choice id='delete'>
-          &lt;action>
-            deleteNote('"+id+"',player);
-          &lt;/action>
-        &lt;/choice>
-      &lt;/menu>
-      ";
-      evalXml(string);
-    }
-    function editNote(id,player,evalXml){
-      var note = getNoteByID(id,player);
-      string = "
-      &lt;window type='input' message='notebook.eval{text:"+note.title+"}' initial='"+note.text+"'>
-        &lt;action>
-          deleteNote("+id+",player);
-          saveNote({title:'"+note.title+"',description:result},player);
-        &lt;/action>
-        &lt;run procedure='notebook'/>
-      &lt;/window>
-      ";
-      evalXml(string);
-    }
-    function deleteNote(id,player){
-      var notes = player.getString("notebook_notes").split("|*");
-      var d = notes[Std.parseInt(id)]; notes.remove(d);
-      var _n = ""; for( r in notes ) {_n += r+"|*";}
-      player.setString("notebook_notes",_n.substr(0,_n.length-2));
-    }
   </action>
-
+  <action>
+    // Empty action
+  </action>
   <procedure id="notebook">
+    <!-- Check for Legacy Notes -->
     <section if="getFlag('legacyNoteCheck') == false">
       <action>
         legacyNoteWindow(player,evalXml); setFlag('legacyNoteCheck',true);
       </action>
       <stop/>
     </section>
+
+    <!-- Main Procedure -->
     <action>
     var icon = "quill.ico";
     var anim = "single";
 
       //shows your notes
-      var notes = getString("notebook_notes");
+      var book = "notebook_notes";
       string = "&lt;window type='craft' title='item.names>notebook' >";
-      if (notes != "") for (note in separateNotes(notes)){
+      if (getString(book) != "") for (note in separateNotes(player,book)){
         string += generateNoteListItem(note);
       }
 
       //create another one
-      //animation="'+anim+'" why was this needed?
       string +=
       '&lt;listItem icon="'+icon+'" title="notebook.create" >
-      &lt;tooltip>
-      &lt;option title="notebook.create_desc" size="small" />
-      &lt;/tooltip>
-      &lt;closeWindows modal="true" />
-      &lt;action>
-      createNote(evalXml);
-      &lt;/action>
+        &lt;tooltip>
+          &lt;option title="notebook.create_desc" size="small" />
+        &lt;/tooltip>
+        &lt;closeWindows modal="true" />
+        &lt;action>
+          editNote(evalXml);
+        &lt;/action>
       &lt;/listItem>';
 
       //Force legacy check
       string +=
       '&lt;listItem icon="'+icon+'" title="notebook.legacy" >
-      &lt;closeWindows modal="true" />
-      &lt;tooltip>
-      &lt;option title="notebook.legacy_desc" size="small" />
-      &lt;/tooltip>
-      &lt;action>
-      legacyNoteWindow(player,evalXml);
-      &lt;/action>
+        &lt;closeWindows modal="true" />
+        &lt;tooltip>
+          &lt;option title="notebook.legacy_desc" size="small" />
+        &lt;/tooltip>
+        &lt;action>
+          legacyNoteWindow(player,evalXml);
+        &lt;/action>
       &lt;/listItem>';
 
       string += "&lt;/window>";
       evalXml(string);
     </action>
   </procedure>
-
 </data>

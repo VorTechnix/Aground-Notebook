@@ -1,3 +1,7 @@
 js/
 
 *.hx
+
+dataconstructor.xml
+dataindexer.xml
+oldprocedure.xml
