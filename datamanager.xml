@@ -1,6 +1,99 @@
 <data>
+  <!-- Functions are seperated into indevidual action tags for easy debugging. -->
+  <!--
+  //Scratch pad
+   "message='notebook.eval{text:"+note.title+"}'"
+  o = {i:10,ti:'Hello',te:'World!'}
+  <run procedure="noteTest"/>
+  -->
   <action>
-
+    function separateNotes(player,bkid,?pos,?len){
+      var notes = player.getString(bkid).split("|*");
+      var cNotes = [];
+      for (note in notes){
+        i = notes.indexOf(note); //if (i &lt; 10){i = "0" + i;}else{i = "" + i;}
+        cNote = {
+          book:bkid,
+          id:i,
+          title:note.substring(0, note.indexOf("|.")),
+          text:note.substring(note.indexOf("|.")+2)
+        }
+        cNotes.push(cNote);
+      }
+      return cNotes;
+    }
+  </action>
+  <action>
+    function editNote(evalXml,book,?o,?player){
+      var note = {id:null,title:'New Note',text:'Who is Arsonist McStabby?'}; if(o != null) note = o;
+      if(player != null) note = noteById(player.getString(book),o);
+      var string = "
+      &lt;window type='input' message='notebook.create_title' initial='"+note.title+"'>
+        &lt;action>
+          a = [result];
+        &lt;/action>
+      &lt;/window>
+      &lt;window type='input' message='notebook.create_description' initial='"+note.text+"'>
+        &lt;action>
+          a.push(result);
+        &lt;/action>
+      &lt;/window>
+      &lt;action>
+        out = {id:"+note.id+",title:a[0],text:a[1]}
+        setString( 'notebook_notes',replaceNote( getString("+book+"), out ) );
+        runProcedure('notebook');
+      &lt;/action>
+      ";
+      evalXml(string);
+    }
+  </action>
+  <action>
+    function replaceNote(str,o){
+      tmp = []; rng = []; if (o.id == null) rng.push(str.length); else rng = fastIndexNotes(str,'|*',o.id,2);
+      tmp.push( str.substring(0,rng[0]-2) ); tmp.push( o.title+'|.'+o.text ); if (o.id != null) tmp.push( str.substr(rng[1]) );
+      return tmp.join('|*');
+    }
+    // str = "Title0|.Here is data: *&^%$#@!0|*Title1|.Here is data: *&^%$#@!1|*Title2|.Here is data: *&^%$#@!2|*Title3|.Here is data: *&^%$#@!3"
+    // o1 = {id:null,title:'New Note',text:'Who is Arsonist McStabby?'}
+    // o2 = {id:2,title:'New Note',text:'Who is Arsonist McStabby?'}
+  </action>
+  <action>
+    function deleteNote(str,id){
+      tmp = []; rng = fastIndexNotes(str,'|*',id,2);
+      tmp.push( str.substring(0,rng[0]) ); if (rng.length == 3){ tmp.push( str.substr(rng[1]) ); tmp = tmp.join();}
+      return tmp;
+    }
+  </action>
+  <action>
+    function fastIndexNotes(str,sep,?pos,?len){
+      pos = pos==null?0:pos; len = len==null?1:len; tmp = [0]; out = "";
+      while( str.indexOf(sep,tmp[tmp.length - 1]) != -1 ) {
+        tmp.push( str.indexOf(sep,tmp[tmp.length - 1]) + sep.length );
+      }
+      tmp.push(str.length); tmp = tmp.slice(pos,pos+len);
+      tmp.push({sid:pos}); return tmp;
+    }
+    // f = fastIndexNotes(str,'|*',0,5); str.substring(f[0],f[3]); str.substring(f[3],f[5]);
+  </action>
+  <action>
+    function noteActions(evalXml,id,book){
+      var string = "
+      &lt;menu section='notebook' closeable='true'>'
+        &lt;choice id='edit'>
+          &lt;action>
+            editNote(evalXml,'"+book+"',"+id+",player);
+          &lt;/action>
+        &lt;/choice>
+        &lt;choice id='delete'>
+          &lt;action>
+            setString( '"+book+"',deleteNote( getString('"+book+"'), "+id+" ) );
+            runProcedure('notebook');
+          &lt;/action>
+        &lt;/choice>
+      &lt;/menu>
+      ";
+      evalXml(string);
+    }
   </action>
   <action>
 

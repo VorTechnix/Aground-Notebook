@@ -8,6 +8,9 @@
     <init>
       <include id="legacy.xml"/>
       <include id="procedure.xml"/>
+      <!-- <include id="dataindexer.xml"/> -->
+      <include id="datamanager.xml"/>
+      <include id="js/_test_database.xml"/>
 
       <tile id="notebook.ico" sheet="items.png" x="0"/>
       <tile id="quill.ico" sheet="items.png" x="1"/>

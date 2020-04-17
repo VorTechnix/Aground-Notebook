@@ -25,7 +25,7 @@
         list =
           '&lt;listItem icon="'+icon+'" title="notebook.eval{text:'+name+'}" >
           &lt;closeWindows modal="true" />
-          &lt;action>legacyNoteUpdate(player,'+note.id+');&lt;/action>
+          &lt;action>legacyNoteUpdate(player,'+note.id+');runProcedure("notebook");&lt;/action>
           &lt;/listItem>';
         return list;
           // &lt;closeWindows modal="true" />
